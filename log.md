@@ -109,3 +109,16 @@ Tile spawning is almost there... I used an 8 bit LFSR to choose from the empty s
 
 Now I need to compare the grid state after the move to before the move, to check if anything changed, i.e. if it was a valid move...
 
+---
+
+### Hour 7
+
+**Date:** 8/25/2025 (mm/dd/yyyy)
+
+**Time range:** 9:09 PM - 10:09 PM 
+
+**Description:**
+
+Lord have mercy on my soul for I can't figure out these stupid timings so it only spawns 1 block after a check...
+
+Considering ending for the day... as expected, no commit :(
