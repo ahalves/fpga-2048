@@ -112,21 +112,70 @@ module tt_um_vga_example (
   end
 
   // grid reset logic
-  integer i,j;
+  integer i, j, k;
+
+  reg [3:0] tmp[0:3];
+  reg [3:0] merged[0:3];
 
   always @(posedge clk or negedge rst_n) begin
-    if (!rst_n) begin 
+    if (!rst_n) begin
+      // reset grid
       for (i=0; i<4; i=i+1)
         for (j=0; j<4; j=j+1)
           grid[i][j] <= 0;
 
       grid[1][1] <= 1;
-      grid[2][2] <= 1;
+      grid[1][3] <= 1;
+      grid[1][2] <= 2;
+      grid[3][0] <= 2;
+      grid[3][3] <= 2;
+      grid[0][0] <= 5;
+      grid[0][1] <= 5;
+      grid[0][2] <= 5;
+      grid[2][0] <= 10;
+      grid[2][1] <= 10;
+      grid[2][2] <= 10;
+      grid[2][3] <= 10;
+
     end
-    else begin 
-      // movement
+    else begin
+
+    // MOVE UP
+
+    if (move_up) begin
+      for (i=0; i<4; i=i+1) begin
+        // copy row & reset merged flags
+        for (j=0; j<4; j=j+1) begin
+          tmp[j] = grid[i][j];
+          merged[j] = 0;
+        end
+
+        // slide and merge
+        for (j=1; j<4; j=j+1) begin
+          if (tmp[j] != 0) begin
+            k = j;
+            // slide 
+            while (k>0 && tmp[k-1]==0) begin
+              tmp[k-1] = tmp[k];
+              tmp[k] = 0;
+              k = k - 1;
+            end
+            // merge
+            if (k>0 && tmp[k-1]==tmp[k] && merged[k-1]==0 && merged[k]==0) begin
+              tmp[k-1] = tmp[k-1]+1;
+              tmp[k] = 0;
+              merged[k-1] = 1;
+            end
+          end
+        end
+
+        // write back row
+        for (j=0; j<4; j=j+1)
+          grid[i][j] <= tmp[j];
+      end
     end
   end
+end
 
   wire border_x = (pix_x % 160 < 4);
   wire border_y = (pix_y % 120 < 4);
