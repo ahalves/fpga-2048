@@ -92,8 +92,8 @@ module tt_um_vga_example (
   reg up_prev, down_prev, left_prev, right_prev;
 
   wire move_up = inp_up & ~up_prev;
-  wire move_down = inp_up & ~down_prev;
-  wire move_left = inp_up & ~left_prev;
+  wire move_down = inp_down & ~down_prev;
+  wire move_left = inp_left & ~left_prev;
   wire move_right = inp_right & ~right_prev;
 
   always @(posedge clk or negedge rst_n) begin
