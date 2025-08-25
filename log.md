@@ -78,3 +78,17 @@ demo of 2 clicks of up showing intended behaviour below:
 Next up: do the same for down, left, and right.
 
 ---
+
+### Hour 5
+
+**Date:** 8/25/2025 (mm/dd/yyyy)
+
+**Time range:** 6:39 PM - 7:39 PM 
+
+**Description:**
+
+Took way me too long to make it work but it works now! Up, down, left, and right shifts are functional.
+
+![ezgif-7f8672576f71b6](https://github.com/user-attachments/assets/8eebeaac-f37e-4eee-b6b5-8e8d76b12532)
+
+Now it's time to add random 2 and 4 tile addition...
