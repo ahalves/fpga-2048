@@ -28,6 +28,11 @@ Block value is/will be represented by a number from 0-11, corresponding to the p
 
 Added border outlines and a default starting position. Added button edge detection logic so that gamepad button down isn't detected every single clock cycle.
 
+<img width="648" height="464" alt="image" src="https://github.com/user-attachments/assets/d905228c-a179-4c2b-80f5-3887393c699b" />
+
+
+---
+
 ### Hour 3
 
 **Date:** 8/25/2025 (mm/dd/yyyy)
@@ -36,4 +41,26 @@ Added border outlines and a default starting position. Added button edge detecti
 
 **Description:**
 
-Working on tile movement and merging...
+Working on figuring out and implementing tile movement and merging logic...
+
+---
+
+### Hour 4
+
+**Date:** 8/25/2025 (mm/dd/yyyy)
+
+**Time range:** 5:19 PM - 6:29 PM 
+
+**Description:**
+
+Fixed a stupid typo with edge triggering buttons...
+
+Finally figured out sliding and merging! (only up so far)
+
+demo of 2 clicks of up showing intended behaviour below:
+
+![Screencast_20250825_183250](https://github.com/user-attachments/assets/147ab493-82fe-460f-b373-328dfa3a6af1)
+
+Next up: do the same for down, left, and right.
+
+---
