@@ -43,6 +43,20 @@ Added border outlines and a default starting position. Added button edge detecti
 
 Working on figuring out and implementing tile movement and merging logic...
 
+Mainly thinking and tinkering around with code here to make sure it actually does what I want it to do: no functional change to previous log :(
+```
+Check if player pressed button on gamepad.
+
+For each row/column (depending on button) in the grid:
+- Make a temporary copy of it
+- Reset a "merged" marker for each tile
+
+Process the tiles from top to bottom:
+- If a tile isn't empty, move it upward as far as possible until it hits another tile or the top
+- If it hits a tile of the same value and neither has merged yet, combine them into one tile with the next value and mark it as merged to prevent further merging in that move
+
+Update the original row/column in the grid with the new positions of the tiles
+```
 ---
 
 ### Hour 4
@@ -53,7 +67,7 @@ Working on figuring out and implementing tile movement and merging logic...
 
 **Description:**
 
-Fixed a stupid typo with edge triggering buttons...
+Fixed a stupid typo with edge triggering buttons... (i can't copy and paste lol)
 
 Finally figured out sliding and merging! (only up so far)
 
