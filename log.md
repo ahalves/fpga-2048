@@ -1,4 +1,4 @@
-## Log
+# Log
 
 ### Hour 1
 **Date:** 8/25/2025 (mm/dd/yyyy)
@@ -107,7 +107,7 @@ Tile spawning is almost there... I used an 8 bit LFSR to choose from the empty s
 
 ![Screencast_20250825_204502](https://github.com/user-attachments/assets/3108895f-2f33-4b41-8135-33bb07a9e508)
 
-Now I need to compare the grid state after the move to before the move, to check if anything changed, i.e. if it was a valid move...
+Now I need to compare the grid state after the move to before the move, to check if anything changed (i.e. if it was a valid move), to see if a block should be spawned.
 
 ---
 
@@ -119,6 +119,24 @@ Now I need to compare the grid state after the move to before the move, to check
 
 **Description:**
 
-Lord have mercy on my soul for I can't figure out these stupid timings so it only spawns 1 block after a check...
+Lord have mercy on my soul for I can't figure out these stupid timings so it only spawns 1 block after a check... it fills up the whole box.
 
 Considering ending for the day... as expected, no commit :(
+
+---
+
+### Hours 8 and 9
+
+**Date:** 8/25/2025 (mm/dd/yyyy)
+
+**Time range:** 10:09 PM - 12:01 AM
+
+**Description:**
+
+Finally, after what felt like an eternity of debugging (and chatgpt pointing out the mistake i was consistently making with timings) essentially all that had to be done was do this to delay spawning by a clock cycle like this:
+
+<img width="531" height="127" alt="image" src="https://github.com/user-attachments/assets/e87f76f5-e0b0-40f1-88eb-9265256ff80b" />
+
+![Untitled video - Made with Clipchamp](https://github.com/user-attachments/assets/f4cbc9dd-fd31-4ca4-aab5-6ba79e1e2a99)
+
+After all of that massive conundrum, I can now think about implementing win and loss logic.
