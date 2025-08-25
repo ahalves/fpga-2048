@@ -87,7 +87,6 @@ module tt_um_vga_example (
   wire [1:0] cell_x = pix_x / 160;
   wire [1:0] cell_y = pix_y / 120;
 
-
   // button edge detection so we dont register input every clk cycle :skull:
   reg up_prev, down_prev, left_prev, right_prev;
 
@@ -111,7 +110,6 @@ module tt_um_vga_example (
     end
   end
 
-
   // lfsr for pseudo randomness
   reg [7:0] lfsr;
 
@@ -127,6 +125,7 @@ module tt_um_vga_example (
 
   reg [3:0] tmp[0:3];
   reg [3:0] merged[0:3];
+  reg grid_changed; // tracks if grid changes during a move
 
   always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
@@ -137,134 +136,152 @@ module tt_um_vga_example (
 
       grid[1][1] <= 1;
       grid[2][2] <= 1;
+      grid_changed <= 0;
 
     end
     else begin
+      grid_changed <= 0; // reset flag at start of clock cycle
 
-    // MOVE UP
+      // MOVE UP
+      if (move_up) begin
+        for (i=0; i<4; i=i+1) begin
+          // copy row & reset merged flags
+          for (j=0; j<4; j=j+1) begin
+            tmp[j] = grid[i][j];
+            merged[j] = 0;
+          end
 
-    if (move_up) begin
-      for (i=0; i<4; i=i+1) begin
-        // copy row & reset merged flags
-        for (j=0; j<4; j=j+1) begin
-          tmp[j] = grid[i][j];
-          merged[j] = 0;
+          // slide and merge
+          for (j=1; j<4; j=j+1) begin
+            if (tmp[j] != 0) begin
+              k = j;
+              // slide 
+              while (k>0 && tmp[k-1]==0) begin
+                tmp[k-1] = tmp[k];
+                tmp[k] = 0;
+                k = k - 1;
+                grid_changed <= 1; // set flag if tiles slide
+              end
+              // merge
+              if (k>0 && tmp[k-1]==tmp[k] && merged[k-1]==0 && merged[k]==0) begin
+                tmp[k-1] = tmp[k-1]+1;
+                tmp[k] = 0;
+                merged[k-1] = 1;
+                grid_changed <= 1; // set flag if tiles merge
+              end
+            end
+          end
+
+          // write back row
+          for (j=0; j<4; j=j+1)
+            if (grid[i][j] != tmp[j]) grid[i][j] <= tmp[j];
+        end
+      end
+
+      // MOVE DOWN
+      if (move_down) begin
+        for (i=0; i<4; i=i+1) begin
+          for (j=0; j<4; j=j+1) begin
+            tmp[j] = grid[i][j];
+            merged[j] = 0;
+          end
+
+          for (j=2; j>=0; j=j-1) begin
+            if (tmp[j] != 0) begin
+              k = j;
+              while (k<3 && tmp[k+1]==0) begin
+                tmp[k+1] = tmp[k];
+                tmp[k] = 0;
+                k = k + 1;
+                grid_changed <= 1;
+              end
+
+              if (k<3 && tmp[k+1]==tmp[k] && merged[k+1]==0 && merged[k]==0) begin
+                tmp[k+1] = tmp[k+1]+1;
+                tmp[k] = 0;
+                merged[k+1] = 1;
+                grid_changed <= 1;
+              end
+            end
+          end
+
+          for (j=0; j<4; j=j+1)
+            if (grid[i][j] != tmp[j]) grid[i][j] <= tmp[j];
+        end
+      end
+
+      // MOVE LEFT
+if (move_left) begin
+    for (j=0; j<4; j=j+1) begin
+        // copy column & reset merged flags
+        for (i=0; i<4; i=i+1) begin
+            tmp[i] = grid[i][j];
+            merged[i] = 0;
         end
 
         // slide and merge
-        for (j=1; j<4; j=j+1) begin
-          if (tmp[j] != 0) begin
-            k = j;
-            // slide 
-            while (k>0 && tmp[k-1]==0) begin
-              tmp[k-1] = tmp[k];
-              tmp[k] = 0;
-              k = k - 1;
-            end
-            // merge
-            if (k>0 && tmp[k-1]==tmp[k] && merged[k-1]==0 && merged[k]==0) begin
-              tmp[k-1] = tmp[k-1]+1;
-              tmp[k] = 0;
-              merged[k-1] = 1;
-            end
-          end
-        end
-
-        // write back row
-        for (j=0; j<4; j=j+1)
-          grid[i][j] <= tmp[j];
-      end
-    end
-
-    // MOVE DOWN
-
-    if (move_down) begin
-      for (i=0; i<4; i=i+1) begin
-        for (j=0; j<4; j=j+1) begin
-          tmp[j] = grid[i][j];
-          merged[j] = 0;
-        end
-
-        for (j=2; j>=0; j=j-1) begin
-          if (tmp[j] != 0) begin
-            k = j;
-            while (k<3 && tmp[k+1]==0) begin
-              tmp[k+1] = tmp[k];
-              tmp[k] = 0;
-              k = k + 1;
-            end
-
-            if (k<3 && tmp[k+1]==tmp[k] && merged[k+1]==0 && merged[k]==0) begin
-              tmp[k+1] = tmp[k+1]+1;
-              tmp[k] = 0;
-              merged[k+1] = 1;
-            end
-          end
-        end
-
-        for (j=0; j<4; j=j+1)
-          grid[i][j] <= tmp[j];
-      end
-    end
-
-    // MOVE LEFT
-
-    if (move_left) begin
-      for (j=0; j<4; j=j+1) begin
-        for (i=0; i<4; i=i+1) begin
-          tmp[i] = grid[i][j];
-          merged[i] = 0;
-        end
-
         for (i=1; i<4; i=i+1) begin
-          if (tmp[i] != 0) begin
-            k = i;
-            while (k>0 && tmp[k-1]==0) begin
-              tmp[k-1] = tmp[k];
-              tmp[k] = 0;
-              k = k - 1;
+            if (tmp[i] != 0) begin
+                k = i;
+                // slide
+                while (k>0 && tmp[k-1]==0) begin
+                    tmp[k-1] = tmp[k];
+                    tmp[k] = 0;
+                    k = k - 1;
+                    grid_changed <= 1;
+                end
+                // merge
+                if (k>0 && tmp[k-1]==tmp[k] && merged[k-1]==0 && merged[k]==0) begin
+                    tmp[k-1] = tmp[k-1] + 1;
+                    tmp[k] = 0;
+                    merged[k-1] = 1;
+                    grid_changed <= 1;
+                end
             end
-            if (k>0 && tmp[k-1]==tmp[k] && merged[k-1]==0 && merged[k]==0) begin
-              tmp[k-1] = tmp[k-1]+1;
-              tmp[k] = 0;
-              merged[k-1] = 1;
-            end
-          end
         end
 
+        // write back column
         for (i=0; i<4; i=i+1)
-          grid[i][j] <= tmp[i];
-      end
+            if (grid[i][j] != tmp[i]) grid[i][j] <= tmp[i];
     end
+end
 
-    if (move_right) begin
-      for (j=0; j<4; j=j+1) begin
+// MOVE RIGHT
+if (move_right) begin
+    for (j=0; j<4; j=j+1) begin
+        // copy column & reset merged flags
         for (i=0; i<4; i=i+1) begin
-          tmp[i] = grid[i][j];
-          merged[i] = 0;
+            tmp[i] = grid[i][j];
+            merged[i] = 0;
         end
 
+        // slide and merge
         for (i=2; i>=0; i=i-1) begin
-          if (tmp[i] != 0) begin
-            k = i;
-            while (k<3 && tmp[k+1]==0) begin
-              tmp[k+1] = tmp[k];
-              tmp[k] = 0;
-              k = k + 1;
+            if (tmp[i] != 0) begin
+                k = i;
+                // slide
+                while (k<3 && tmp[k+1]==0) begin
+                    tmp[k+1] = tmp[k];
+                    tmp[k] = 0;
+                    k = k + 1;
+                    grid_changed <= 1;
+                end
+                // merge
+                if (k<3 && tmp[k+1]==tmp[k] && merged[k+1]==0 && merged[k]==0) begin
+                    tmp[k+1] = tmp[k+1] + 1;
+                    tmp[k] = 0;
+                    merged[k+1] = 1;
+                    grid_changed <= 1;
+                end
             end
-            if (k<3 && tmp[k+1]==tmp[k] && merged[k+1]==0 && merged[k]==0) begin
-              tmp[k+1] = tmp[k+1]+1;
-              tmp[k] = 0;
-              merged[k+1] = 1;
-            end
-          end
         end
 
+        // write back column
         for (i=0; i<4; i=i+1)
-          grid[i][j] <= tmp[i];
-      end
+            if (grid[i][j] != tmp[i]) grid[i][j] <= tmp[i];
     end
-  end
+end
+    end
   end
 
   reg move_happened;
@@ -272,14 +289,11 @@ module tt_um_vga_example (
   always @(posedge clk or negedge rst_n) begin
     if (!rst_n)
       move_happened <= 0;
-    else if (move_left | move_right | move_up | move_down) // temp condition for testing spawning
-      move_happened <= 1;
     else
-      move_happened <= 0;
+      move_happened <= grid_changed; // Only set if grid changed
   end
 
   // find empty cells
-
   integer empty_count;
   integer empty_cells[0:15];
 
