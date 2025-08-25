@@ -88,6 +88,29 @@ module tt_um_vga_example (
   wire [1:0] cell_y = pix_y / 120;
 
 
+  // button edge detection so we dont register input every clk cycle :skull:
+  reg up_prev, down_prev, left_prev, right_prev;
+
+  wire move_up = inp_up & ~up_prev;
+  wire move_down = inp_up & ~down_prev;
+  wire move_left = inp_up & ~left_prev;
+  wire move_right = inp_right & ~right_prev;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      up_prev <= 0;
+      down_prev <= 0;
+      left_prev <= 0;
+      right_prev <= 0;
+    end
+    else begin
+      up_prev <= inp_up;
+      down_prev <= inp_down;
+      left_prev <= inp_left;
+      right_prev <= inp_right;
+    end
+  end
+
   // grid reset logic
   integer i,j;
 
@@ -97,36 +120,30 @@ module tt_um_vga_example (
         for (j=0; j<4; j=j+1)
           grid[i][j] <= 0;
 
-      grid[0][0] <= 0;
-      grid[1][0] <= 1;
-      grid[2][0] <= 2;
-      grid[3][0] <= 3;
-
-      grid[0][1] <= 4;
-      grid[1][1] <= 5;
-      grid[2][1] <= 6;
-      grid[3][1] <= 7;
-
-      grid[0][2] <= 8;
-      grid[1][2] <= 9;
-      grid[2][2] <= 10;
-      grid[3][2] <= 11;
-
-      grid[0][3] <= 0;
-      grid[1][3] <= 1;
-      grid[2][3] <= 2;
-      grid[3][3] <= 3;
+      grid[1][1] <= 1;
+      grid[2][2] <= 1;
     end
     else begin 
       // movement
     end
   end
 
+  wire border_x = (pix_x % 160 < 4);
+  wire border_y = (pix_y % 120 < 4);
+
+  wire border_r = (pix_x >= 636);
+  wire border_b = (pix_y >= 476);
+
+  wire border = border_x | border_y | border_b | border_r;
+
   reg [5:0] tile_color;
 
   always @(*) begin 
     if (!video_active) begin
       tile_color = BLACK;
+    end
+    else if (border) begin
+      tile_color = {2'b10, 2'b10, 2'b10};
     end
     else begin 
       case (grid[cell_x][cell_y])
