@@ -67,9 +67,48 @@ module tt_um_vga_example (
   );
 
   // Colors
-  localparam [5:0] BLACK = {2'b00, 2'b00, 2'b00};
-  localparam [5:0] GREEN = {2'b00, 2'b11, 2'b00};
-  localparam [5:0] WHITE = {2'b11, 2'b11, 2'b11};
+  // BLACK RED ORANGE YELLOW LIME GREEN TEAL CYAN BLUE MAGENTA PINK WHITE
+
+  localparam [5:0] BLACK = {2'b00, 2'b00, 2'b00};   // default
+  localparam [5:0] RED = {2'b11, 2'b00, 2'b00};     // 2
+  localparam [5:0] ORANGE = {2'b11, 2'b10, 2'b00};  // 4
+  localparam [5:0] YELLOW = {2'b11, 2'b11, 2'b00};  // 8
+  localparam [5:0] LIME = {2'b10, 2'b11, 2'b00};    // 16
+  localparam [5:0] GREEN = {2'b00, 2'b11, 2'b00};   // 32
+  localparam [5:0] TEAL = {2'b00, 2'b11, 2'b10};    // 64
+  localparam [5:0] CYAN = {2'b00, 2'b11, 2'b11};    // 128
+  localparam [5:0] BLUE = {2'b00, 2'b00, 2'b11};    // 256
+  localparam [5:0] MAGENTA = {2'b11, 2'b00, 2'b11}; // 512
+  localparam [5:0] PINK = {2'b11, 2'b01, 2'b11};    // 1024
+  localparam [5:0] WHITE = {2'b11, 2'b11, 2'b11};   // 2048
+  
+  localparam [9:0] STRIPE_W = 53;
+  reg [5:0] stripe_color;
+
+  always @(*) begin
+    if (!video_active) begin
+      stripe_color = BLACK;
+    end
+    else begin
+      case (pix_x/STRIPE_W)
+        0: stripe_color = BLACK;
+        1: stripe_color = RED;
+        2: stripe_color = ORANGE;
+        3: stripe_color = YELLOW;
+        4: stripe_color = LIME;
+        5: stripe_color = GREEN;
+        6: stripe_color = TEAL;
+        7: stripe_color = CYAN;
+        8: stripe_color = BLUE;
+        9: stripe_color = MAGENTA;
+        10: stripe_color = PINK;
+        11: stripe_color = WHITE;
+        default: stripe_color = BLACK;
+      endcase
+    end
+  end
+
+  assign {R, G, B} = stripe_color;
 
 endmodule
 
