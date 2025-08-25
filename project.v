@@ -132,10 +132,10 @@ module tt_um_vga_example (
       grid[0][0] <= 5;
       grid[0][1] <= 5;
       grid[0][2] <= 5;
-      grid[2][0] <= 10;
-      grid[2][1] <= 10;
-      grid[2][2] <= 10;
-      grid[2][3] <= 10;
+      grid[2][0] <= 9;
+      grid[2][1] <= 9;
+      grid[2][2] <= 9;
+      grid[2][3] <= 9;
 
     end
     else begin
@@ -174,6 +174,96 @@ module tt_um_vga_example (
           grid[i][j] <= tmp[j];
       end
     end
+
+    // MOVE DOWN
+
+    if (move_down) begin
+      for (i=0; i<4; i=i+1) begin
+        for (j=0; j<4; j=j+1) begin
+          tmp[j] = grid[i][j];
+          merged[j] = 0;
+        end
+
+        for (j=2; j>=0; j=j-1) begin
+          if (tmp[j] != 0) begin
+            k = j;
+            while (k<3 && tmp[k+1]==0) begin
+              tmp[k+1] = tmp[k];
+              tmp[k] = 0;
+              k = k + 1;
+            end
+
+            if (k<3 && tmp[k+1]==tmp[k] && merged[k+1]==0 && merged[k]==0) begin
+              tmp[k+1] = tmp[k+1]+1;
+              tmp[k] = 0;
+              merged[k+1] = 1;
+            end
+          end
+        end
+
+        for (j=0; j<4; j=j+1)
+          grid[i][j] <= tmp[j];
+      end
+    end
+
+    // MOVE LEFT
+
+    if (move_left) begin
+      for (j=0; j<4; j=j+1) begin
+        for (i=0; i<4; i=i+1) begin
+          tmp[i] = grid[i][j];
+          merged[i] = 0;
+        end
+
+        for (i=1; i<4; i=i+1) begin
+          if (tmp[i] != 0) begin
+            k = i;
+            while (k>0 && tmp[k-1]==0) begin
+              tmp[k-1] = tmp[k];
+              tmp[k] = 0;
+              k = k - 1;
+            end
+            if (k>0 && tmp[k-1]==tmp[k] && merged[k-1]==0 && merged[k]==0) begin
+              tmp[k-1] = tmp[k-1]+1;
+              tmp[k] = 0;
+              merged[k-1] = 1;
+            end
+          end
+        end
+
+        for (i=0; i<4; i=i+1)
+          grid[i][j] <= tmp[i];
+      end
+    end
+
+    if (move_right) begin
+      for (j=0; j<4; j=j+1) begin
+        for (i=0; i<4; i=i+1) begin
+          tmp[i] = grid[i][j];
+          merged[i] = 0;
+        end
+
+        for (i=2; i>=0; i=i-1) begin
+          if (tmp[i] != 0) begin
+            k = i;
+            while (k<3 && tmp[k+1]==0) begin
+              tmp[k+1] = tmp[k];
+              tmp[k] = 0;
+              k = k + 1;
+            end
+            if (k<3 && tmp[k+1]==tmp[k] && merged[k+1]==0 && merged[k]==0) begin
+              tmp[k+1] = tmp[k+1]+1;
+              tmp[k] = 0;
+              merged[k+1] = 1;
+            end
+          end
+        end
+
+        for (i=0; i<4; i=i+1)
+          grid[i][j] <= tmp[i];
+      end
+    end
+
   end
 end
 
