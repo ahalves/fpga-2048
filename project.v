@@ -81,34 +81,73 @@ module tt_um_vga_example (
   localparam [5:0] MAGENTA = {2'b11, 2'b00, 2'b11}; // 512
   localparam [5:0] PINK = {2'b11, 2'b01, 2'b11};    // 1024
   localparam [5:0] WHITE = {2'b11, 2'b11, 2'b11};   // 2048
-  
-  localparam [9:0] STRIPE_W = 53;
-  reg [5:0] stripe_color;
 
-  always @(*) begin
-    if (!video_active) begin
-      stripe_color = BLACK;
+  reg [3:0] grid[0:3][0:3];
+
+  wire [1:0] cell_x = pix_x / 160;
+  wire [1:0] cell_y = pix_y / 120;
+
+
+  // grid reset logic
+  integer i,j;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin 
+      for (i=0; i<4; i=i+1)
+        for (j=0; j<4; j=j+1)
+          grid[i][j] <= 0;
+
+      grid[0][0] <= 0;
+      grid[1][0] <= 1;
+      grid[2][0] <= 2;
+      grid[3][0] <= 3;
+
+      grid[0][1] <= 4;
+      grid[1][1] <= 5;
+      grid[2][1] <= 6;
+      grid[3][1] <= 7;
+
+      grid[0][2] <= 8;
+      grid[1][2] <= 9;
+      grid[2][2] <= 10;
+      grid[3][2] <= 11;
+
+      grid[0][3] <= 0;
+      grid[1][3] <= 1;
+      grid[2][3] <= 2;
+      grid[3][3] <= 3;
     end
-    else begin
-      case (pix_x/STRIPE_W)
-        0: stripe_color = BLACK;
-        1: stripe_color = RED;
-        2: stripe_color = ORANGE;
-        3: stripe_color = YELLOW;
-        4: stripe_color = LIME;
-        5: stripe_color = GREEN;
-        6: stripe_color = TEAL;
-        7: stripe_color = CYAN;
-        8: stripe_color = BLUE;
-        9: stripe_color = MAGENTA;
-        10: stripe_color = PINK;
-        11: stripe_color = WHITE;
-        default: stripe_color = BLACK;
+    else begin 
+      // movement
+    end
+  end
+
+  reg [5:0] tile_color;
+
+  always @(*) begin 
+    if (!video_active) begin
+      tile_color = BLACK;
+    end
+    else begin 
+      case (grid[cell_x][cell_y])
+        0: tile_color = BLACK;
+        1: tile_color = RED;
+        2: tile_color = ORANGE;
+        3: tile_color = YELLOW;
+        4: tile_color = LIME;
+        5: tile_color = GREEN;
+        6: tile_color = TEAL;
+        7: tile_color = CYAN;
+        8: tile_color = BLUE;
+        9: tile_color = MAGENTA;
+        10: tile_color = PINK;
+        11: tile_color = WHITE;
+        default: tile_color = BLACK;
       endcase
     end
   end
 
-  assign {R, G, B} = stripe_color;
+  assign {R,G,B} = tile_color;
 
 endmodule
 
