@@ -92,3 +92,20 @@ Took way me too long to make it work but it works now! Up, down, left, and right
 ![ezgif-7f8672576f71b6](https://github.com/user-attachments/assets/8eebeaac-f37e-4eee-b6b5-8e8d76b12532)
 
 Now it's time to add random 2 and 4 tile addition...
+
+---
+
+### Hour 5
+
+**Date:** 8/25/2025 (mm/dd/yyyy)
+
+**Time range:** 7:57 PM -  PM 
+
+**Description:**
+
+Tile spawning is almost there... I used an 8 bit LFSR to choose from the empty squares on each move and select either a 2 or a 4 tile to spawn there. 
+
+![Screencast_20250825_204502](https://github.com/user-attachments/assets/3108895f-2f33-4b41-8135-33bb07a9e508)
+
+Now I need to compare the grid state after the move to before the move, to check if anything changed, i.e. if it was a valid move...
+
