@@ -111,6 +111,17 @@ module tt_um_vga_example (
     end
   end
 
+
+  // lfsr for pseudo randomness
+  reg [7:0] lfsr;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+        lfsr <= 8'h69; // haha funny seed
+    else
+        lfsr <= {lfsr[6:0], lfsr[7] ^ lfsr[5] ^ lfsr[4] ^ lfsr[3]};
+  end
+
   // grid reset logic
   integer i, j, k;
 
@@ -125,17 +136,7 @@ module tt_um_vga_example (
           grid[i][j] <= 0;
 
       grid[1][1] <= 1;
-      grid[1][3] <= 1;
-      grid[1][2] <= 2;
-      grid[3][0] <= 2;
-      grid[3][3] <= 2;
-      grid[0][0] <= 5;
-      grid[0][1] <= 5;
-      grid[0][2] <= 5;
-      grid[2][0] <= 9;
-      grid[2][1] <= 9;
-      grid[2][2] <= 9;
-      grid[2][3] <= 9;
+      grid[2][2] <= 1;
 
     end
     else begin
@@ -263,9 +264,59 @@ module tt_um_vga_example (
           grid[i][j] <= tmp[i];
       end
     end
-
   end
-end
+  end
+
+  reg move_happened;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      move_happened <= 0;
+    else if (move_left | move_right | move_up | move_down) // temp condition for testing spawning
+      move_happened <= 1;
+    else
+      move_happened <= 0;
+  end
+
+  // find empty cells
+
+  integer empty_count;
+  integer empty_cells[0:15];
+
+  always @(*) begin
+    empty_count = 0;
+
+    for (i=0; i<16; i=i+1)
+        empty_cells[i] = 0;
+    
+    for (i=0; i<4; i=i+1)
+      for (j=0; j<4; j=j+1)
+        if (grid[i][j] == 0) begin
+          empty_cells[empty_count] = i*4 + j;
+          empty_count = empty_count + 1;
+        end
+  end
+
+  integer idx;
+  integer spawn_i, spawn_j;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      idx <= 0;
+      spawn_i <= 0;
+      spawn_j <= 0;
+    end
+    else if (move_happened && empty_count > 0) begin
+      idx <= lfsr % empty_count;
+      spawn_i <= empty_cells[idx] / 4;
+      spawn_j <= empty_cells[idx] % 4;
+
+      if (lfsr < 8'd230) //about 90% chance for a 2
+        grid[spawn_i][spawn_j] <= 1;
+      else
+        grid[spawn_i][spawn_j] <= 2; // so about 10 for a 4
+    end
+  end
 
   wire border_x = (pix_x % 160 < 4);
   wire border_y = (pix_y % 120 < 4);
