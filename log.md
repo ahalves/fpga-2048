@@ -27,3 +27,13 @@ Block value is/will be represented by a number from 0-11, corresponding to the p
 **Description:**
 
 Added border outlines and a default starting position. Added button edge detection logic so that gamepad button down isn't detected every single clock cycle.
+
+### Hour 3
+
+**Date:** 8/25/2025 (mm/dd/yyyy)
+
+**Time range:** 4:19 PM - 5:19 PM 
+
+**Description:**
+
+Working on tile movement and merging...
