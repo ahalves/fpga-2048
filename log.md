@@ -17,6 +17,7 @@ Then moved on to adding a 4x4 game grid with coloring logic based on block value
 
 Block value is/will be represented by a number from 0-11, corresponding to the powers of 2 (2^11 = 2048).
 
+---
 
 ### Hour 2
 **Date:** 8/25/2025 (mm/dd/yyyy)
